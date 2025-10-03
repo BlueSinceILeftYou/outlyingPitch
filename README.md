@@ -1,7 +1,9 @@
 # Pitcher Anomaly Detection with Statcast Data
 
+**(Edits to our project plan that reference the issue will be in bold text. Also, check note at bottom of readme)**
+
 ## Project Overview
-We will build a model that, given a single pitch based on Statcast features and context, predicts which pitcher threw it. This will be done for all pitchers (with a certain number of innings pitched) in the MLB, and based on those pitches assigned to that pitcher, we can then identify “outlier” pitches. This will be based on how unusual that pitch was for that pitcher in the context of pitching metrics (release point, spin rate, …), as well as game context (current count, position of runners, …). We can assign an anomaly score to this and then flag suspicious, uncharacteristic pitches.  
+We will build a model that, given a single pitch based on Statcast features and context, predicts which pitcher threw it. This will be done for **qualified** pitchers in the MLB (**who have thrown at least 162 innings per season**), and based on those pitches assigned to that pitcher, we can then identify “outlier” pitches. This will be based on how unusual that pitch was for that pitcher in the context of pitching metrics (release point, spin rate, …), as well as game context (current count, position of runners, …). We can assign an anomaly score to this and then flag suspicious, uncharacteristic pitches.  
 Use case: Recently, multiple MLB pitchers have been investigated purposefully missing pitches in connection with gambling. Our model can help identify these anomaly pitches that help encourage further human review.
 
 ---
@@ -25,7 +27,7 @@ We then normalize the numerical pitch data so they are on comparable ranges.
 ## Modeling Process
 We could use one of two approaches, or both. We could use some form of unsupervised learning for pure outlier detection. The other approach is to create binary classifiers for each pitcher using XGBoost, CatBoost, logistic regression, etc., and then select the best model. We consider a pitch “suspect” if the model determines it is unlikely that the pitcher threw it.  
 
-**Test Plan** - We will train on 80% of the pitching data for model tuning and validation then we will have 20% of the pitching data as a test. We will first classify the pitch to a certain pitcher and given the actual pitcher who threw it, we can model how atypical it is. Can model probability as a simple Gaussian (bell curve) function. If the pitch has an abnormally low Z score, then we can flag the pitch as atypical and warrant further review.  
+**Test Plan** - We will train on 80% of the pitching data for model tuning and validation then we will have 20% of the pitching data as a test. **We will only test on data that was trained on in the same year (because the pitching style of different pitchers can change from year to year, it would be inconsistent to compare data across years. We learned this from our visualization of the data as well as looking at data visualizations for different pitchers on Savant).** We will first classify the pitch to a certain pitcher and given the actual pitcher who threw it, we can model how atypical it is. Can model probability as a simple Gaussian (bell curve) function. If the pitch has an abnormally low Z score, then we can flag the pitch as atypical and warrant further review.  
 
 ---
 
@@ -37,13 +39,13 @@ We can do something similar to this by comparing the vector of weights for each 
 ## Test Plan & Evaluation Metrics (Will be modified as we walk through)
 
 ### Data Split
-- Training set → Use to teach the model  
-- Validation set → use to tune settings  
-- Test set → check the performance of the trained machine  
+- Training set → Use to teach the model
+- Validation set → use to tune settings
+- Test set → check the performance of the trained machine
 
 ### Baseline
-- Classification → always predict the majority classification  
-- Regression → always predict the average value.  
+- Classification → always predict the majority classification
+- Regression → always predict the average value.
 
 ### Classification model training
 - Train XGBoost, CatBoost, logistic regression, etc.  
@@ -55,15 +57,18 @@ We can do something similar to this by comparing the vector of weights for each 
 - Compare result with the baseline.  
 
 ### Evaluation Metrics (as we walk through)
-- Accuracy  
-- Precision  
-- Recall  
-- f1-score  
-- r^2  
+- Recall/fb-score: **this is for evaluating the performance of our binary classifiers. We specifically look at recall because we want to avoid false negatives (i.e. a pitch being marked an outlier when it isn't). But fb score is still relevant if we want to know whether or not a false negative or false positive is more significant.**
+- ROC curve/AUC: **This is also for evaluation of our binary classifiers, if we ever determine the false positive rate to be a significant issue**
+- Silhouette Score: (**This could be used for our unsupervised learning approach**)
 
 ---
 
 ## Potential Risks
 - There might not be enough data for each” person. Therefore, we will not be able to classify every person who plays. We will be able to classify people who have already “enough” data.  
 - If the model is imbalanced, it might cause the high accuracy but catches 0 outliers(We will be able to find this out by other metrics)  
-- High risk on failure of predicting the “specific” case.  
+- High risk on failure of predicting the “specific” case.
+
+
+## Note
+- The reason we do not want to train on past seasons and test on new ones is due to inconsistencies with the data measured by year. For example, there may be a pitcher that passes our threshold for qualified pitcher in one season, but not the other. So we decided to treat each year as its own monolith, comparing only pitches that were thrown in the same year.
+- We will elaborate on the features that influence specific pitch types more than others (for example, if spin axis is more likely to vary in a slider pitch than another feature)

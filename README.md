@@ -81,22 +81,27 @@ All numerical features were normalized using StandardScaler to ensure they are o
 
 We created several visualizations to understand the data:
 
-**Release Point Analysis:**
-- Scatter plot of release_pos_x vs release_pos_z showing distinct clusters for left-handed and right-handed pitchers
-- Individual pitcher release point plots colored by pitch type, revealing consistency and variation patterns
+### Release Point Analysis
 
-**Pitch Distribution:**
-- Histogram of total pitches thrown by each pitcher, showing the distribution across all MLB pitchers
-- Used to determine appropriate minimum pitch count threshold
+Scatter plot of release_pos_x vs release_pos_z showing distinct clusters for left-handed and right-handed pitchers:
 
-**Feature Correlation Matrices:**
-- Initial correlation matrix showed confounding effects of mixing left-handed and right-handed pitchers
-- Separate correlation matrices by handedness revealed clearer relationships between features
-- Notable correlations: release_speed with plate_z, spin_rate with spin_axis (within handedness groups)
+![Release Point Clusters](images/release_point_clusters.png)
 
-**Spin Characteristics:**
-- Scatter plots of release_spin_rate vs spin_axis by pitch type for individual pitchers
-- Reveals distinct clusters for different pitch types
+Individual pitcher release point plots colored by pitch type, revealing consistency and variation patterns:
+
+![Release Point by Pitch Type](images/release_point_pitch_type.png)
+
+### Pitch Distribution
+
+Histogram of total pitches thrown by each pitcher, showing the distribution across all MLB pitchers. This was used to determine appropriate minimum pitch count threshold:
+
+![Pitch Count Distribution](images/pitch_count_histogram.png)
+
+### Feature Correlation Matrices
+
+Initial correlation matrix showed confounding effects of mixing left-handed and right-handed pitchers. Separate correlation matrices by handedness revealed clearer relationships between features, with notable correlations between release_speed and plate_z, and spin_rate with spin_axis within handedness groups:
+
+![Correlation Matrix by Handedness](images/correlation_matrix_handedness.png)
 
 ---
 
